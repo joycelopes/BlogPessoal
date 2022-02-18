@@ -1,6 +1,7 @@
 package com.generation.blogpessoal.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.generation.blogpessoal.model.Postagem;
 import com.generation.blogpessoal.repository.PostagemRepository;
@@ -57,9 +59,7 @@ public class PostagemController {
 				.body(postagemRepository.save(postagem));
 	}
 	@PutMapping
-	public ResponseEntity<Postagem> putPostagem (@Valid @RequestBody Postagem postagem){
-		
-	//	return  ResponseEntity.status(HttpStatus.OK).body(postagemRepository.save(postagem));
+	public ResponseEntity<Postagem> putPostagem (@RequestBody Postagem postagem){
 		
 		return postagemRepository.findById(postagem.getId())
 				.map(resposta -> ResponseEntity.status(HttpStatus.OK).body(postagemRepository.save(postagem)))
@@ -67,37 +67,21 @@ public class PostagemController {
 
 		}
 	
-	//@DeleteMapping("/{id}")
-	//@ResponseStatus(HttpStatus.NO_CONTENT)
-	//public void deletePostagem (@PathVariable Long id) {
-		///postagemRepository.deleteById(id);
-		
-		
-        //  return ResponseEntity.noContent().build();
-//  }).orElse(ResponseEntity.notFound().build());
-		
 	
-	
-	//@DeleteMapping("/{id}")
 
-	//@ResponseStatus(HttpStatus.NO_CONTENT)
-
-	//public void deleteById(@PathVariable Long id) { // throws PersonNotFoundException {
-		//postagemRepository.deleteById(id);
-	   //personService.deleteById(id);
-
-		
-		
-		
 		@DeleteMapping("/{id}")
-	   public ResponseEntity<Object> deletePostagem(@PathVariable Long id)
-	   {
-	        return postagemRepository.findById(id).map(resposta -> 
-	       {
-	                postagemRepository.deleteById(id);
-	                return ResponseEntity.noContent().build();
-	        }).orElse(ResponseEntity.notFound().build());
-	    }
+		@ResponseStatus(value = HttpStatus.NO_CONTENT)
+		public void deletePostagem(@PathVariable Long id) {
+			Optional<Postagem> postagem = postagemRepository.findById(id);
+			
+			if(postagem.isEmpty())
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			postagemRepository.deleteById(id);
+			
+			
+		}
+	  	
+	
 	}
 
 	
