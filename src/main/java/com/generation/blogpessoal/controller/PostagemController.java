@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.generation.blogpessoal.model.Postagem;
 import com.generation.blogpessoal.repository.PostagemRepository;
+import com.generation.blogpessoal.repository.TemaRepository;
 
 
 @RestController
@@ -31,6 +32,9 @@ public class PostagemController {
 	
 	@Autowired
 	private PostagemRepository postagemRepository;
+	
+	@Autowired
+	private TemaRepository temaRepository;
 	
 	@GetMapping
 	public ResponseEntity<List<Postagem>> getAll(){
@@ -54,18 +58,29 @@ public class PostagemController {
 	}
 	@PostMapping 
 	public ResponseEntity<Postagem> postPostagem (@Valid @RequestBody Postagem postagem){
-		
-		return  ResponseEntity.status(HttpStatus.CREATED)
-				.body(postagemRepository.save(postagem));
+   if(temaRepository.existsById(postagem.getTema().getId())) {
+		  	
+			return ResponseEntity.status(HttpStatus.CREATED)
+					.body(postagemRepository.save(postagem));
+		}
+           return ResponseEntity.notFound().build();
+
+
 	}
 	@PutMapping
 	public ResponseEntity<Postagem> putPostagem (@RequestBody Postagem postagem){
+		
+		  if(temaRepository.existsById(postagem.getTema().getId())) {
+			  
+		  
 		
 		return postagemRepository.findById(postagem.getId())
 				.map(resposta -> ResponseEntity.status(HttpStatus.OK).body(postagemRepository.save(postagem)))
 				.orElse(ResponseEntity.notFound().build());
 
 		}
+		return ResponseEntity.notFound().build();
+		  }
 	
 	
 
@@ -74,12 +89,12 @@ public class PostagemController {
 		public void deletePostagem(@PathVariable Long id) {
 			Optional<Postagem> postagem = postagemRepository.findById(id);
 			
-			if(postagem.isEmpty())
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-			postagemRepository.deleteById(id);
-			
-			
-		}
+		if(postagem.isEmpty())
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		postagemRepository.deleteById(id);
+		
+		
+		}  
 	  	
 	
 	}
