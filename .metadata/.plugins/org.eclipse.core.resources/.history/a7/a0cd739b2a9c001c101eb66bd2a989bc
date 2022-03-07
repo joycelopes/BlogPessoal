@@ -1,0 +1,5 @@
+package com.generation.BlogPessoal.repository;
+
+public interface TemaRepository {
+
+}

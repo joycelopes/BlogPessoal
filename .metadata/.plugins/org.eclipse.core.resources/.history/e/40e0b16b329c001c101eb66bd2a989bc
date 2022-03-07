@@ -1,0 +1,5 @@
+package com.generation.BlogPessoal.security;
+
+public class UserDetailsServiceImpl {
+
+}
